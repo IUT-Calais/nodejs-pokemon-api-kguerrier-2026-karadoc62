@@ -91,6 +91,14 @@ async function main() {
         imageUrl: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/007.png"
       }
   });
+  
+  await prisma.user.create({
+    data:
+      { 
+        email: "admin@gmail.com",
+        password: "admin"
+      }
+  });
 
   console.log('Seed completed!');
 }

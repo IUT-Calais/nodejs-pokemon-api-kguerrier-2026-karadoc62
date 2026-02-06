@@ -36,10 +36,6 @@ export const createPokemonCard = async (req: Request, res: Response) => {
             imageUrl
         } = req.body;
     try{
-        
-
-       // TODO GESTION ERREURS
-
         const pokemon = await prisma.pokemonCard.create({
             data : {
                 name,
@@ -53,13 +49,8 @@ export const createPokemonCard = async (req: Request, res: Response) => {
         });
         res.status(201).send(pokemon);
     }
-    catch (error: any){
-        console.log("CREATE ERROR =>", error);
-        res.status(500).send({
-            error: "Une erreur est survenue",
-            details: error?.message,
-            code: error?.code
-        });
+    catch (error){
+        res.status(500).send({error : "Une erreur est survenue"});
     }
 }
 
@@ -95,18 +86,11 @@ export const updatePokemonCard = async (req: Request, res: Response) => {
                 }
             }
         );
-
         res.status(200).send(pokemon);
     }
-    catch (error: any){
-        console.log("CREATE ERROR =>", error);
-        res.status(500).send({
-            error: "Une erreur est survenue",
-            details: error?.message,
-            code: error?.code
-        });
+    catch (error){
+        res.status(500).send({error : "Une erreur est survenue"});
     }
-    
 };
 
 export const deletePokemonCard = async (req: Request, res: Response) => {
