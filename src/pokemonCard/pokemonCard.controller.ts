@@ -26,27 +26,74 @@ export const getPokemonCardById = async (req: Request, res: Response) => {
 }
 
 export const createPokemonCard = async (req: Request, res: Response) => {
-    const {
-        name,
-        pokedexId,
-        lifePoints,
-        typeName,
-        size,
-        weight,
-        imageUrl
-    } = req.body;
-
-    const pokemon = await prisma.pokemonCard.create({
-        data : {
+    try{
+        const {
             name,
             pokedexId,
             lifePoints,
+            typeName,
             size,
             weight,
-            imageUrl,
-            type: {connect: {name: typeName}}
-        }
-    });
+            imageUrl
+        } = req.body;
 
-    res.status(201).send(pokemon);
+       // TODO GESTION ERREURS
+
+        const pokemon = await prisma.pokemonCard.create({
+            data : {
+                name,
+                pokedexId,
+                lifePoints,
+                size,
+                weight,
+                imageUrl,
+                type: {connect: {name: typeName}}
+            }
+        });
+        res.status(201).send(pokemon);
+    }
+    catch (error){
+        res.status(500).send({error : "Une erreur est survenue"});
+    }
 }
+
+export const updatePokemonCard = async (req: Request, res: Response) => {
+    const pokemonCardId = req.params.pokemonCardId;
+    
+    const {
+            name,
+            pokedexId,
+            lifePoints,
+            typeName,
+            size,
+            weight,
+            imageUrl
+        } = req.body;
+    
+    try{
+        const pokemon = await prisma.pokemonCard.update(
+            {
+                where: {
+                    id: Number(pokemonCardId)
+                },
+                data: {
+                    name,
+                    pokedexId,
+                    lifePoints,
+                    size,
+                    weight,
+                    imageUrl,
+                    type:{
+                        connect: {name: typeName}
+                    }
+                }
+            }
+        );
+
+        res.status(200).send(pokemon);
+    }
+    catch (error){
+        res.status(500).send({error: "Une erreur est survenue"});
+    }
+    
+};
