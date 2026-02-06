@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {getPokemonCardById, getPokemonCards, createPokemonCard, updatePokemonCard} from './pokemonCard.controller.js';
+import {getPokemonCardById, getPokemonCards, createPokemonCard, updatePokemonCard, deletePokemonCard} from './pokemonCard.controller.js';
 
 export const pokemonCardRouter = Router();
 

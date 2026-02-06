@@ -26,8 +26,7 @@ export const getPokemonCardById = async (req: Request, res: Response) => {
 }
 
 export const createPokemonCard = async (req: Request, res: Response) => {
-    try{
-        const {
+    const {
             name,
             pokedexId,
             lifePoints,
@@ -36,6 +35,8 @@ export const createPokemonCard = async (req: Request, res: Response) => {
             weight,
             imageUrl
         } = req.body;
+    try{
+        
 
        // TODO GESTION ERREURS
 
@@ -52,8 +53,13 @@ export const createPokemonCard = async (req: Request, res: Response) => {
         });
         res.status(201).send(pokemon);
     }
-    catch (error){
-        res.status(500).send({error : "Une erreur est survenue"});
+    catch (error: any){
+        console.log("CREATE ERROR =>", error);
+        res.status(500).send({
+            error: "Une erreur est survenue",
+            details: error?.message,
+            code: error?.code
+        });
     }
 }
 
@@ -92,8 +98,31 @@ export const updatePokemonCard = async (req: Request, res: Response) => {
 
         res.status(200).send(pokemon);
     }
-    catch (error){
-        res.status(500).send({error: "Une erreur est survenue"});
+    catch (error: any){
+        console.log("CREATE ERROR =>", error);
+        res.status(500).send({
+            error: "Une erreur est survenue",
+            details: error?.message,
+            code: error?.code
+        });
     }
     
+};
+
+export const deletePokemonCard = async (req: Request, res: Response) => {
+    const pokemonCardId = req.params.pokemonCardId;
+
+    try{
+        const pokemon = await prisma.pokemonCard.delete(
+            {
+                where: {
+                    id: Number(pokemonCardId)
+                }
+            }
+        );
+        res.status(200).send(pokemon);
+    }
+    catch(error){
+        res.status(500).send({error: "Une erreur est survenue"});
+    }
 };
