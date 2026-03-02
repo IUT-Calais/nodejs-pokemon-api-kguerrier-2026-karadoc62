@@ -3,8 +3,13 @@ import prisma from '../client.js'
 
 
 export const getPokemonCards = async (_req: Request, res: Response) => {
-    const pokemonCards = await prisma.pokemonCard.findMany();
-    res.status(200).send(pokemonCards);
+    try{
+        const pokemonCards = await prisma.pokemonCard.findMany();
+        res.status(200).send(pokemonCards);
+    }
+    catch(error){
+        res.status(500).send({error : "Une erreur est survenue"});
+    }
 }
 
 export const getPokemonCardById = async (req: Request, res: Response) => {
