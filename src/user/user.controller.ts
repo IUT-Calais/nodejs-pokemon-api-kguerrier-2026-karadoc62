@@ -1,22 +1,46 @@
 import type {Request, Response} from 'express';
-import prisma from '../client.js'
+import prisma from '../client.js';
+import bcrypt from 'bcrypt';
 
 export const createUser = async (req: Request, res: Response) => {
-    const {
-        email,
-        password
-    } = req.body;
+    const { email, password } = req.body;
+
+    // Vérification que les champs ne soient pas vide
+    if(!email || email.trim() === ""){
+        res.status(400).send({error: "Email obligatoire"});
+        return
+    }
+    if(!password || password.trim() === ""){
+        res.status(400).send({error: "Password obligatoire"});
+        return
+    }
 
     try{
+        // Vérifictaion que l'email n'existe pas en base
+        const alreadyExistUser = await prisma.user.findUnique({
+            where : {email}
+        });
+        if(alreadyExistUser){
+            res.status(400).send({error : "Email déjà utilisé"});
+            return
+        }
+    
+        // cryptage du mot de passe avec bcrypt
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // crétaion de l'utilsiateur
         const user = await prisma.user.create(
             {
                 data: {
                     email,
-                    password
+                    password: hashedPassword
                 }
             }
         );
-        res.status(201).send(user);
+        res.status(201).send({
+            id: user.id,
+            email: user.email
+        });
     }
     catch(error){
         res.status(500).send({error: "Une erreur est survenue"});
@@ -29,7 +53,8 @@ export const loginApplication = async (req: Request, res: Response) => {
         const user = await prisma.user.findUnique(
             {where : {email}}
         );
-        res.status(200).send()
+        res.status(200).send({
+        });
     }
     catch(error){
         res.status(500).send({error: "Une erreur est survenue"});
