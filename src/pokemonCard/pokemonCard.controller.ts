@@ -41,6 +41,57 @@ export const createPokemonCard = async (req: Request, res: Response) => {
             imageUrl
         } = req.body;
     try{
+        // Tests des champs obkigatoires
+        if (!name || name.trim() === ""){
+            res.status(400).send({error: "Le nom est obligatoire"});
+            return
+        }
+        if (!pokedexId){
+            res.status(400).send({error: "L'id du pokédex est obligatoire"});
+            return
+        }
+        if (!lifePoints){
+            res.status(400).send({error: "Le nombre de points de vie est obligatoire"});
+            return
+        }
+        if (!typeName || typeName.trim() === ""){
+            res.status(400).send({error: "Le type du pokémon est obligatoire"});
+            return
+        }
+
+        // test si type est dans la liste
+        const type = await prisma.type.findUnique(
+            {
+                where: {name: typeName}
+            }
+        );
+        if (!type){
+            res.status(400).send({error: "Le type n'existe pas"});
+            return
+        }
+
+        // test de doublon sur le nom
+        const nameExist = await prisma.pokemonCard.findUnique(
+            {where: {name}}
+        );
+        if (nameExist){
+            res.status(400).send("Le nom de pokémon existe déjà");
+            return
+        }
+        
+        // test de doublon sur le pokedexId
+        const pokedexIdExist = await prisma.pokemonCard.findUnique(
+            {
+                where: {pokedexId}
+            }
+        );
+        if (pokedexIdExist){
+            res.status(400).send({error: "Le numéro de pokédex existe déjà"});
+            return
+        }
+
+        // tout est ok on continue
+    
         const pokemon = await prisma.pokemonCard.create({
             data : {
                 name,
@@ -55,13 +106,15 @@ export const createPokemonCard = async (req: Request, res: Response) => {
         res.status(201).send(pokemon);
     }
     catch (error){
+        console.error("Erreur createPokemonCard :", error);
         res.status(500).send({error : "Une erreur est survenue"});
+        return
     }
 }
 
 export const updatePokemonCard = async (req: Request, res: Response) => {
-    const pokemonCardId = req.params.pokemonCardId;
-    
+    const pokemonCardId = Number(req.params.pokemonCardId);
+
     const {
             name,
             pokedexId,
@@ -71,8 +124,73 @@ export const updatePokemonCard = async (req: Request, res: Response) => {
             weight,
             imageUrl
         } = req.body;
-    
+  
     try{
+        // test que le pokemon a cet id existe
+        const pokemonCardIdExist = await prisma.pokemonCard.findUnique(
+            {where: {id: Number(pokemonCardId) }}
+        )
+        if (!pokemonCardIdExist){
+            res.status(404).send({error: "Le pokémon n'existe pas"});
+            return
+        }
+
+        // Tests des champs obkigatoires
+        if (!name || name.trim() === ""){
+            res.status(400).send({error: "Le nom est obligatoire"});
+            return
+        }
+        if (!pokedexId){
+            res.status(400).send({error: "L'id du pokédex est obligatoire"});
+            return
+        }
+        if (!lifePoints){
+            res.status(400).send({error: "Le nombre de points de vie est obligatoire"});
+            return
+        }
+        if (!typeName || typeName.trim() === ""){
+            res.status(400).send({error: "Le type du pokémon est obligatoire"});
+            return
+        }
+
+        // test si type est dans la liste
+        const type = await prisma.type.findUnique(
+            {
+                where: {name: typeName}
+            }
+        );
+        if (!type){
+            res.status(400).send({error: "Le type n'existe pas"});
+            return
+        }
+
+        // test de doublon sur le nom
+        const nameExist = await prisma.pokemonCard.findFirst(
+            {where: {
+                name,
+                id: {not: pokemonCardId}
+            }}
+        );
+        if (nameExist){
+            res.status(400).send("Le nom de pokémon existe déjà");
+            return
+        }
+        
+        // test de doublon sur le pokedexId
+        const pokedexIdExist = await prisma.pokemonCard.findFirst(
+            {
+                where: {
+                    pokedexId,
+                    id: {not: pokemonCardId}
+                }
+            }
+        );
+        if (pokedexIdExist){
+            res.status(400).send({error: "Le numéro de pokédex existe déjà"});
+            return
+        }
+
+        
         const pokemon = await prisma.pokemonCard.update(
             {
                 where: {
@@ -98,10 +216,20 @@ export const updatePokemonCard = async (req: Request, res: Response) => {
     }
 };
 
+
 export const deletePokemonCard = async (req: Request, res: Response) => {
     const pokemonCardId = req.params.pokemonCardId;
 
     try{
+        // test que le pokemon a cet id existe
+        const pokemonCardIdExist = await prisma.pokemonCard.findUnique(
+            {where: {id: Number(pokemonCardId) }}
+        )
+        if (!pokemonCardIdExist){
+            res.status(404).send({error: "Le pokémon n'existe pas"});
+            return
+        }
+        
         const pokemon = await prisma.pokemonCard.delete(
             {
                 where: {

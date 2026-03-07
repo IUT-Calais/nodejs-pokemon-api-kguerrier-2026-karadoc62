@@ -1,6 +1,7 @@
 import type {Request, Response} from 'express';
 import prisma from '../client.js';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 export const createUser = async (req: Request, res: Response) => {
     const { email, password } = req.body;
@@ -53,9 +54,11 @@ export const loginApplication = async (req: Request, res: Response) => {
     // Vérification de la présence des champs requis
     if(!email || email.trim() === ""){
         res.status(400).send({error: "Email requis"});
+        return
     }
     if(!password || password.trim() === ""){
         res.status(400).send({error: "Mot de passe requis"});
+        return
     }
     
     try{
@@ -76,16 +79,20 @@ export const loginApplication = async (req: Request, res: Response) => {
             res.status(401).send({error: "L'utilisateur ou le mot de passe est erroné"});
             return
         }
-
         
+        // integration token
+        const token = jwt.sign(
+            {
+                id: user.id,
+                email: user.email
+            },
+            process.env.JWT_SECRET as string,
+            {
+                expiresIn: process.env.JWT_EXPIRATION
+            }
+        );
 
-        
-
-        
-
-
-        res.status(200).send({
-        });
+        res.status(200).send({token});
     }
     catch(error){
         res.status(500).send({error: "Une erreur est survenue"});

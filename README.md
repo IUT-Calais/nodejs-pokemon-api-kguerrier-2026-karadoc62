@@ -99,8 +99,8 @@ Pour ce faire vous allez modifier le modèle `PokemonCard` existant dans le fich
 
 Le but va être de créer les endpoints pour gérer les cartes pokémons. Ces endpoints seront les suivants:
 
-- `GET:/pokemons-cards` : permet d'obtenir la liste de tous les pokémons
-- `GET:/pokemons-cards/:pokemonCardId` : permet d'obtenir un pokémon spécifique en fonction de la clé `pokemonCardId` passé en paramètre.
+- `GET:/pokemon-cards` : permet d'obtenir la liste de tous les pokémons
+- `GET:/pokemon-cards/:pokemonCardId` : permet d'obtenir un pokémon spécifique en fonction de la clé `pokemonCardId` passé en paramètre.
 - `POST:/pokemon-cards` : permet d'enregistrer le pokémon dont les propriétés sont passées dans le body de la requête
 - `PATCH:/pokemon-cards/:pokemonCardId` : permet de modifier le pokémon donc le `pokemonCardId` est passé en paramètre et les propriétés passées dans le body.
 - `DELETE:/pokemon-cards/:pokemonCardId:` : permet de supprimer le pokémon renseigné avec son `pokemonCardId`.
@@ -192,9 +192,9 @@ L'endpoint `POST:/users/login` prendra en paramètre un objet JSON contenant les
 
 Vous traiterez les codes http suivants:
 
-- `201 Created` : Si la connexion a réussi
-- `404 Not Found` : Si l'utilisateur n'existe pas en base de données
-- `400 Bad Request` : Si le mot de passe ne correspond pas à l'utilisateur
+- `200 Created` : Si la connexion a réussi
+- `401 Unauthorized` : Si l'utilisateur n'existe pas en base de données
+- `401 Unauthorized` : Si le mot de passe ne correspond pas à l'utilisateur
 
 > Nous utilons ici une méthode `POST` et non `GET` car il s'agit d'un point de vue applicatif de la création d'une session utilisateur. Dans le cas d'une création le `POST` est donc plus logique.
 
