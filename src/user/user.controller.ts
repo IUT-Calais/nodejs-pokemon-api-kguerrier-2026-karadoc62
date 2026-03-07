@@ -7,11 +7,11 @@ export const createUser = async (req: Request, res: Response) => {
 
     // Vérification que les champs ne soient pas vide
     if(!email || email.trim() === ""){
-        res.status(400).send({error: "Email obligatoire"});
+        res.status(400).send({error: "Email et password obligatoires"});
         return
     }
     if(!password || password.trim() === ""){
-        res.status(400).send({error: "Password obligatoire"});
+        res.status(400).send({error: "Email et password obligatoires"});
         return
     }
 
@@ -21,7 +21,7 @@ export const createUser = async (req: Request, res: Response) => {
             where : {email}
         });
         if(alreadyExistUser){
-            res.status(400).send({error : "Email déjà utilisé"});
+            res.status(400).send({error : "Utilisateur déjà existant"});
             return
         }
     
@@ -49,10 +49,41 @@ export const createUser = async (req: Request, res: Response) => {
 
 export const loginApplication = async (req: Request, res: Response) => {
     const{email, password} = req.body;
+
+    // Vérification de la présence des champs requis
+    if(!email || email.trim() === ""){
+        res.status(400).send({error: "Email requis"});
+    }
+    if(!password || password.trim() === ""){
+        res.status(400).send({error: "Mot de passe requis"});
+    }
+    
     try{
+        // récupération du user
         const user = await prisma.user.findUnique(
             {where : {email}}
         );
+
+        // vérification de l'existence du user
+        if(!user){
+            res.status(401).send({error: "L'utilisateur ou le mot de passe est erroné"});
+            return
+        }
+
+        // verifier le mot de passe avec bcrypt
+        const passwordOk = await bcrypt.compare(password, user.password);
+        if (!passwordOk){
+            res.status(401).send({error: "L'utilisateur ou le mot de passe est erroné"});
+            return
+        }
+
+        
+
+        
+
+        
+
+
         res.status(200).send({
         });
     }

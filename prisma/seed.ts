@@ -1,11 +1,11 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
   await prisma.pokemonCard.deleteMany();
   await prisma.type.deleteMany();
-  
   await prisma.user.deleteMany();
 
   await prisma.type.createMany({
@@ -102,7 +102,8 @@ async function main() {
     data:
       { 
         email: "admin@gmail.com",
-        password: "admin"
+        //password: "admin"
+        password: await bcrypt.hash("admin", 10)
       }
   });
 
