@@ -30,7 +30,7 @@ export const verifyJWT = (req: Request, res: Response, next: NextFunction,) => {
         // 3. Ajouter userId à la requête pour l'utiliser dans les routes
         req.userId = decoded.userId
         
-        // 4. Passer au prochain middleware ou à la route
+        // 4. Passer au prochain middleware ou à la route 
         next()
     } catch (error) {
         res.status(403).json({ error: 'Token invalide ou expiré' })
