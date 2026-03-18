@@ -106,7 +106,6 @@ export const createPokemonCard = async (req: Request, res: Response) => {
         res.status(201).send(pokemon);
     }
     catch (error){
-        console.error("Erreur createPokemonCard :", error);
         res.status(500).send({error : "Une erreur est survenue"});
         return
     }

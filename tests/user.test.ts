@@ -6,6 +6,9 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { stopServer } from '../src/index';
 
+jest.mock('bcrypt');
+jest.mock('jsonwebtoken');
+
 beforeEach(() => {
   jest.clearAllMocks();
 });
@@ -16,6 +19,7 @@ afterAll(() => {
 
 describe('User API', () => {
   describe('POST /users', () => {
+
     it('should create a new user', async () => {
       const createdUser = {
         id: 1,
@@ -91,6 +95,21 @@ describe('User API', () => {
       expect(response.status).toBe(400);
       expect(response.body).toHaveProperty('error');
     });
+
+    //test erreur serveur
+    it('should return 500 if create user fails', async () => {
+      prismaMock.user.create.mockRejectedValue(new Error('DB error'));
+
+      const response = await request(app)
+        .post('/users')
+        .send({
+          email: 'karadoc@gmail.com',
+          password: 'password123'
+        });
+
+      expect(response.status).toBe(500);
+      expect(response.body).toEqual({ error: 'Une erreur est survenue' });
+    });
   });
 
 
@@ -158,6 +177,45 @@ describe('User API', () => {
     });
 
 
+    it('should return 400 if email is missing on login', async () => {
+      const response = await request(app)
+        .post('/users/login')
+        .send({
+          email: '',
+          password: 'password123'
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({ error: 'Email requis' });
+    });
+
+
+    it('should return 400 if password is missing on login', async () => {
+      const response = await request(app)
+        .post('/users/login')
+        .send({
+          email: 'karadoc@gmail.com',
+          password: ''
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({ error: 'Mot de passe requis' });
+    });
+
+
+    it('should return 500 if login fails', async () => {
+      prismaMock.user.findUnique.mockRejectedValue(new Error('DB error'));
+
+      const response = await request(app)
+        .post('/users/login')
+        .send({
+          email: 'karadoc@gmail.com',
+          password: 'password123'
+        });
+
+      expect(response.status).toBe(500);
+      expect(response.body).toEqual({ error: 'Une erreur est survenue' });
+    });
 
   });
 });
