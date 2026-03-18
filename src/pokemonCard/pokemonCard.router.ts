@@ -1,6 +1,6 @@
 import {Router} from 'express';
-import {getPokemonCardById, getPokemonCards, createPokemonCard, updatePokemonCard, deletePokemonCard} from './pokemonCard.controller.js';
-import { verifyJWT } from '../common/jwt.middleware.js';
+import {getPokemonCardById, getPokemonCards, createPokemonCard, updatePokemonCard, deletePokemonCard} from './pokemonCard.controller';
+import { verifyJWT } from '../common/jwt.middleware';
 
 export const pokemonCardRouter = Router();
 

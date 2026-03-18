@@ -1,5 +1,5 @@
 import type {Request, Response} from 'express';
-import prisma from '../client.js'
+import prisma from '../client'
 
 
 export const getPokemonCards = async (_req: Request, res: Response) => {
