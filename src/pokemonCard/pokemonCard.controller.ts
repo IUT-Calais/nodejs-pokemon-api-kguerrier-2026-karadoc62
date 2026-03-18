@@ -20,7 +20,7 @@ export const getPokemonCardById = async (req: Request, res: Response) => {
             where: {id: Number(pokemonCardId)},
         });
         if (!pokemonCard){
-            res.status(404).send("Pokémon non trouvé");
+            res.status(404).send({error: "Pokémon non trouvé"});
             return
         }
         res.status(200).send(pokemonCard);
@@ -35,7 +35,7 @@ export const createPokemonCard = async (req: Request, res: Response) => {
             name,
             pokedexId,
             lifePoints,
-            typeName,
+            type,
             size,
             weight,
             imageUrl
@@ -54,18 +54,18 @@ export const createPokemonCard = async (req: Request, res: Response) => {
             res.status(400).send({error: "Le nombre de points de vie est obligatoire"});
             return
         }
-        if (!typeName || typeName.trim() === ""){
+        if (!type){
             res.status(400).send({error: "Le type du pokémon est obligatoire"});
             return
         }
 
         // test si type est dans la liste
-        const type = await prisma.type.findUnique(
+        const typeExist = await prisma.type.findUnique(
             {
-                where: {name: typeName}
+                where: {id: Number(type)}
             }
         );
-        if (!type){
+        if (!typeExist){
             res.status(400).send({error: "Le type n'existe pas"});
             return
         }
@@ -75,7 +75,7 @@ export const createPokemonCard = async (req: Request, res: Response) => {
             {where: {name}}
         );
         if (nameExist){
-            res.status(400).send("Le nom de pokémon existe déjà");
+            res.status(400).send({error: "Le nom de pokémon existe déjà"});
             return
         }
         
@@ -100,7 +100,7 @@ export const createPokemonCard = async (req: Request, res: Response) => {
                 size,
                 weight,
                 imageUrl,
-                type: {connect: {name: typeName}}
+                type: {connect: {id: Number(type)}}
             }
         });
         res.status(201).send(pokemon);
@@ -119,7 +119,7 @@ export const updatePokemonCard = async (req: Request, res: Response) => {
             name,
             pokedexId,
             lifePoints,
-            typeName,
+            type,
             size,
             weight,
             imageUrl
@@ -148,18 +148,16 @@ export const updatePokemonCard = async (req: Request, res: Response) => {
             res.status(400).send({error: "Le nombre de points de vie est obligatoire"});
             return
         }
-        if (!typeName || typeName.trim() === ""){
+        if (!type){
             res.status(400).send({error: "Le type du pokémon est obligatoire"});
             return
         }
 
         // test si type est dans la liste
-        const type = await prisma.type.findUnique(
-            {
-                where: {name: typeName}
-            }
-        );
-        if (!type){
+        const typeExist = await prisma.type.findUnique({
+            where: { id: Number(type) }
+        });
+        if (!typeExist){
             res.status(400).send({error: "Le type n'existe pas"});
             return
         }
@@ -172,7 +170,7 @@ export const updatePokemonCard = async (req: Request, res: Response) => {
             }}
         );
         if (nameExist){
-            res.status(400).send("Le nom de pokémon existe déjà");
+            res.status(400).send({error: "Le nom de pokémon existe déjà"});
             return
         }
         
@@ -204,7 +202,7 @@ export const updatePokemonCard = async (req: Request, res: Response) => {
                     weight,
                     imageUrl,
                     type:{
-                        connect: {name: typeName}
+                        connect: {id: Number(type)}
                     }
                 }
             }
@@ -237,7 +235,7 @@ export const deletePokemonCard = async (req: Request, res: Response) => {
                 }
             }
         );
-        res.status(200).send(pokemon);
+        res.status(204).send();
     }
     catch(error){
         res.status(500).send({error: "Une erreur est survenue"});
