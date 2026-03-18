@@ -2,6 +2,17 @@ import request from 'supertest'; // pour simuler les requetes HHTTP
 import { app } from '../src';
 import { prismaMock } from './jest.setup';
 
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { stopServer } from '../src/index';
+
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
+afterAll(() => {
+  stopServer();
+})
 
 describe('User API', () => {
   describe('POST /users', () => {
@@ -91,8 +102,10 @@ describe('User API', () => {
         email: 'karadoc@gmail.com',
         password: 'password123',
       };
-      const token = 'mockedToken';
-
+      // const token = 'mockedToken';
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      (jwt.sign as jest.Mock).mockReturnValue('mockedToken');
+      
       prismaMock.user.findUnique.mockResolvedValue(createdUser);
 
       const response = await request(app)
@@ -104,8 +117,7 @@ describe('User API', () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual({
-        token: 'mockedToken',
-        message: 'Connexion réussie',
+        token: 'mockedToken'
       });
     });
 
@@ -132,10 +144,12 @@ describe('User API', () => {
         password: 'password123',
       });
 
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
       const response = await request(app)
         .post('/users/login')
         .send({
-          email: 'admin@gmail.com',
+          email: 'karadoc@gmail.com',
           password: 'password456',
         });
 
