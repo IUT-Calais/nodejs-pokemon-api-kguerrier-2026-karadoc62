@@ -3,12 +3,23 @@ import { pokemonCardRouter } from './pokemonCard/pokemonCard.router';
 import { userRouter } from './user/user.router';
 import 'dotenv/config';
 
+// On ajoute les informations pour swagger
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+import path from 'path';
+
 
 export const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
+// On charge la spécification Swagger
+const swaggerDocument = YAML.load(path.join(__dirname, './swagger.yaml'));
+// Et on affecte le Serveur Swagger UI à l'adresse /api-docs
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+//Routes
 app.use('/pokemon-cards', pokemonCardRouter);
 app.use('/users', userRouter);
 
