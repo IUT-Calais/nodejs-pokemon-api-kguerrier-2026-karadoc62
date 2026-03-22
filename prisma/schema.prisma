@@ -23,11 +23,20 @@ model PokemonCard{
   size Float?
   weight Float?
   imageUrl String?
+  decks Deck[] @relation("Cards_PokemonCard")
 }
 
 model User{
   id Int @id @default(autoincrement())
   email String @unique
   password String
+  decks Deck[] @relation("Owner_User")
 }
 
+model Deck{
+  id Int @id @default(autoincrement())
+  name String
+  cards PokemonCard[] @relation(name: "Cards_PokemonCard")
+  owner User @relation(name: "Owner_User", fields: [ownerId], references: [id])
+  ownerId Int
+}
