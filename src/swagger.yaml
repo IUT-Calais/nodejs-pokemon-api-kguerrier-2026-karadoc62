@@ -273,6 +273,103 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /decks:
+    get:
+      tags:
+        - Decks
+      summary: Récupérer tous les decks
+      responses:
+        "200":
+          description: Liste des decks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Deck'
+        "500":
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Decks
+      summary: Créer un deck
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeckInput'
+      responses:
+        "201":
+          description: Deck créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deck'
+        "400":
+          description: Données invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Utilisateur non authentifié ou token manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Token invalide ou expiré
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /decks/{deckId}:
+    get:
+      tags:
+        - Decks
+      summary: Récupérer un deck par son ID
+      parameters:
+        - name: deckId
+          in: path
+          required: true
+          description: ID du deck
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deck trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deck'
+        "404":
+          description: Deck non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -402,3 +499,47 @@ components:
         imageUrl:
           type: string
           example: https://assets.pokemon.com/assets/cms2/img/pokedex/full/007.png
+
+    DeckOwner:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          example: sacha@pokemon.com
+
+    Deck:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Deck Eau
+        ownerId:
+          type: integer
+          example: 1
+        owner:
+          $ref: '#/components/schemas/DeckOwner'
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/PokemonCard'
+
+    DeckInput:
+      type: object
+      required:
+        - name
+        - cards
+      properties:
+        name:
+          type: string
+          example: Deck Eau
+        cards:
+          type: array
+          items:
+            type: integer
+          example: [1, 2, 3]
