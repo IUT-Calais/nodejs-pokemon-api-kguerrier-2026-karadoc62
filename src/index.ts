@@ -1,6 +1,7 @@
 import express from 'express';
 import { pokemonCardRouter } from './pokemonCard/pokemonCard.router';
 import { userRouter } from './user/user.router';
+import { deckRouter } from './deck/deck.router';
 import 'dotenv/config';
 
 // On ajoute les informations pour swagger
@@ -22,6 +23,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 //Routes
 app.use('/pokemon-cards', pokemonCardRouter);
 app.use('/users', userRouter);
+app.use('/decks', deckRouter);
+
 
 // ==================================================================
 // partie ajoutée afin de régler le probleme de serveur qui se lance pour les tests avec une erreur:
